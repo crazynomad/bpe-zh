@@ -1,73 +1,73 @@
-# React + TypeScript + Vite
+# 中文 BPE 分词可视化 · 字节级
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+一个交互式动画,从零演示 **字节级 BPE(Byte-Level Byte Pair Encoding)** 的训练过程,
+帮你直观看懂一个常被忽略的事实:**中文为什么比英文更费 token。**
 
-Currently, two official plugins are available:
+> 灵感来自 [bpe-visualizer.com](https://www.bpe-visualizer.com/)(字符级)。本项目改做**字节级**,
+> 以贴近 GPT-2 / GPT-4 等真实分词器,并针对中文补充了"字节 ↔ 汉字"双视图。
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 为什么要做字节级?
 
-## React Compiler
+大多数 BPE 演示是**字符级**的:把文本按字符切开再合并。但真实的大模型分词器走的是**字节级**:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. 先把文本 **UTF-8 编码成字节**;
+2. 在字节序列上统计相邻对频率、反复合并最高频的对。
 
-## Expanding the ESLint configuration
+关键差异在中文上暴露无遗:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+| 文本 | UTF-8 字节数 | 起始 token 数 |
+|------|------------|--------------|
+| `cat` | 3 | 3 |
+| `猫`  | 3 | **3**(一个汉字 = 3 字节) |
+| `你好` | 6 | 6 |
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+英文一个字母就是 1 字节、1 个起始 token;**一个汉字要占 3 个字节**,分词器得先把这 3 个裸字节
+"拼回"成一个汉字,才谈得上进一步合并。这就是中文 token 消耗更高的根源。
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 可视化怎么读
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **原文行**:逐字符展示,并标注每个字符占几个 UTF-8 字节(`3B` / `1B`)。
+- **token 序列行**:
+  - 🩶 **灰色等宽块** = 半个字符的**裸字节**(如 `E4`),还没拼成完整字符;
+  - 🟦 **蓝色块** = 完整的单字节 ASCII 字符;
+  - 🟨 **彩色块** = 已经拼成完整字符的 token,**同一个 token 永远同色**,一眼看出反复合并出的大单元。
+- **黄色描边 + 频率表黄高亮** = 下一步将被合并的相邻对(算法选频次最高的)。
+- **绿色脉冲环** = 刚刚这一步合并出的新 token。
+
+试试 **「重复词」** 预设(`你好你好你好你好`):24 个灰色裸字节会一步步拼装,
+最终收成 2 个金色的「你好你好」,**压缩率 12×** —— 这就是 BPE 的核心魔法。
+
+## 本地运行
+
+```bash
+pnpm install
+pnpm dev        # http://localhost:5173
+pnpm build      # 产物在 dist/
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+引擎冒烟测试:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+node --experimental-strip-types src/bpe.test.mjs
 ```
+
+## 技术栈
+
+纯前端,无后端:Vite + React 19 + TypeScript + Tailwind CSS v4。
+核心引擎 [`src/bpe.ts`](src/bpe.ts) 约 150 行,无第三方分词依赖。
+
+## 部署
+
+推送到 `main` 即由 GitHub Actions 自动构建并发布到 GitHub Pages(见 `.github/workflows/deploy.yml`)。
+Pages 项目站需要 `base: '/bpe-zh/'`,构建时通过环境变量 `GITHUB_PAGES=1` 开启。
+
+## 实现要点
+
+- **字节 → 字符还原判定**:用 `new TextDecoder("utf-8", { fatal: true })`。完整 UTF-8 序列解码成功 →
+  显示汉字;不完整/非法序列会抛异常 → 退回显示 hex。一个判定区分"完整字符"和"裸字节"。
+- **token id 布局**:基础字节用字节值当 id(0–255),合并产物从 256 起递增 —— 与真实 GPT-2 词表布局一致。
+- 这是 **BPE 训练过程**(从语料学合并规则)的演示,不是用固定词表做编码的 Tiktokenizer。
+
+## License
+
+MIT
