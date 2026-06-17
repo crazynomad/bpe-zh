@@ -259,7 +259,7 @@ export default function App() {
           BPE 步骤（点击跳转）
         </div>
         <StepsBar
-          steps={result.steps}
+          steps={result.steps.slice(0, step.index + 1)}
           tokens={result.tokens}
           current={step.index}
           onSelect={(i) => {

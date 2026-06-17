@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { ByteToken, Step } from "../bpe";
 import { chipStyle } from "../colors";
 
@@ -29,8 +30,15 @@ function Tk({ tok }: { tok: ByteToken }) {
 // BPE 步骤条：横向、全宽，每步用中文讲清这一步发生了什么
 // （合并式 + 出现次数 + 当前 token 数 + 词表大小），可点击跳转。
 export default function StepsBar({ steps, tokens, current, onSelect }: Props) {
+  // 当前步始终是最右侧那张卡，随推进自动滚动到末尾，保证当前步可见。
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (el) el.scrollLeft = el.scrollWidth;
+  }, [current]);
+
   return (
-    <div className="flex gap-2 overflow-x-auto pb-2">
+    <div ref={ref} className="flex gap-2 overflow-x-auto pb-2">
       {steps.map((st) => {
         const active = st.index === current;
         const m = st.merge;
