@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { ByteToken, Step } from "../bpe";
-import { chipStyle } from "../colors";
+import { chipStyle, showToken } from "../colors";
 
 interface Props {
   steps: Step[];
@@ -22,7 +22,7 @@ function Tk({ tok }: { tok: ByteToken }) {
         fontFamily: s.mono ? "var(--font-mono)" : undefined,
       }}
     >
-      {tok.text === " " ? "␣" : tok.text}
+      {showToken(tok.text)}
     </span>
   );
 }

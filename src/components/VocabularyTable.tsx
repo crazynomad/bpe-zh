@@ -1,5 +1,5 @@
 import type { ByteToken, Step } from "../bpe";
-import { chipStyle } from "../colors";
+import { chipStyle, showToken } from "../colors";
 
 interface Props {
   step: Step;
@@ -47,7 +47,7 @@ export default function VocabularyTable({ step, tokens, topN }: Props) {
               }}
               title={`token #${id} · ${tok.bytes.length} 字节`}
             >
-              {tok.text === " " ? "␣" : tok.text}
+              {showToken(tok.text)}
             </span>
             {isBase && (
               <span

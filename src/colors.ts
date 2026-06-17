@@ -35,6 +35,12 @@ export function isPunctuation(text: string): boolean {
   return text.length > 0 && /^\p{P}+$/u.test(text);
 }
 
+// token 展示用：把不可见空白替换成可见符号，否则 "␣t"（空格+字母）会看起来和单独的 "t" 一样。
+// 仅用于 token 类组件（token 序列 / 词表 / 步骤条 / 合并产物），原文面板保持自然显示。
+export function showToken(text: string): string {
+  return text.replace(/ /g, "␣").replace(/\n/g, "↵").replace(/\t/g, "⇥");
+}
+
 export function chipStyle(token: ByteToken): ChipStyle {
   if (!token.complete) return PARTIAL;
   if (isPunctuation(token.text)) return MUTED;

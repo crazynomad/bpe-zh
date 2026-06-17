@@ -1,5 +1,5 @@
 import type { ByteToken, Step } from "../bpe";
-import { chipStyle } from "../colors";
+import { chipStyle, showToken } from "../colors";
 
 interface Props {
   step: Step;
@@ -19,7 +19,7 @@ function Chip({ token }: { token: ByteToken }) {
         fontFamily: s.mono ? "var(--font-mono)" : undefined,
       }}
     >
-      {token.text === " " ? "␣" : token.text}
+      {showToken(token.text)}
     </span>
   );
 }

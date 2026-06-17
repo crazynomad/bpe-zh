@@ -1,5 +1,5 @@
 import type { ByteToken, Step } from "../bpe";
-import { chipStyle } from "../colors";
+import { chipStyle, showToken } from "../colors";
 
 interface Props {
   step: Step;
@@ -63,9 +63,7 @@ export default function TokenRow({ step, tokens, showIds }: Props) {
               .map((b) => b.toString(16).toUpperCase().padStart(2, "0"))
               .join(" ")}]`}
           >
-            <span className="whitespace-pre">
-              {tok.text === " " ? "␣" : tok.text}
-            </span>
+            <span className="whitespace-pre">{showToken(tok.text)}</span>
             {showIds && (
               <span className="mt-0.5 text-[10px] opacity-60">{id}</span>
             )}

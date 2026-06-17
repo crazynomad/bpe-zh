@@ -7,6 +7,7 @@ import StepsBar from "./components/StepsBar";
 import Stats from "./components/Stats";
 import OriginalText from "./components/OriginalText";
 import { PRESETS, DEFAULT_TEXT } from "./presets";
+import { showToken } from "./colors";
 
 const SPEEDS = [0.5, 1, 2, 4];
 
@@ -322,7 +323,7 @@ export default function App() {
 function tokenText(result: ReturnType<typeof trainBPE>, id: number): string {
   const t = result.tokens.get(id);
   if (!t) return "?";
-  return t.text === " " ? "␣" : t.text;
+  return showToken(t.text);
 }
 
 function Panel({
