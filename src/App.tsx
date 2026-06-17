@@ -22,6 +22,7 @@ export default function App() {
   const [maxMerges, setMaxMerges] = useState(60);
   const [minFrequency, setMinFrequency] = useState(2);
   const [showIds, setShowIds] = useState(false);
+  const [showCharInfo, setShowCharInfo] = useState(true);
   const [vocabTopN, setVocabTopN] = useState(10);
 
   const [current, setCurrent] = useState(0);
@@ -131,6 +132,14 @@ export default function App() {
           <label className="flex cursor-pointer items-center gap-2">
             <input
               type="checkbox"
+              checked={showCharInfo}
+              onChange={(e) => setShowCharInfo(e.target.checked)}
+            />
+            显示字符编码（Unicode）
+          </label>
+          <label className="flex cursor-pointer items-center gap-2">
+            <input
+              type="checkbox"
               checked={showIds}
               onChange={(e) => setShowIds(e.target.checked)}
             />
@@ -228,8 +237,8 @@ export default function App() {
       {/* 响应式：窄屏自上而下堆叠；≥lg 三栏并排（a 原文 / b token 序列 / c 词表+合并产物）。
           minmax(0,…) 让超长 token 行收缩换行而非撑破栏宽，支持一直放大到超宽屏。 */}
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(200px,1fr)_minmax(0,2fr)_minmax(280px,340px)]">
-        <Panel title="原文（按字符，标注字节数）" className="lg:max-h-[75vh]">
-          <OriginalText text={text} />
+        <Panel title="原文（逐字符）" className="lg:max-h-[75vh]">
+          <OriginalText text={text} showInfo={showCharInfo} />
         </Panel>
         <Panel title="当前 token 序列" className="lg:max-h-[75vh]">
           <TokenRow step={step} tokens={result.tokens} showIds={showIds} />
