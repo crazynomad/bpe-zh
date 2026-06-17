@@ -62,27 +62,42 @@ export default function App() {
   return (
     <div className="mx-auto w-full max-w-[1680px] px-4 py-8 2xl:max-w-[2240px] 2xl:px-8">
       <header className="mb-6">
-        <h1 className="text-2xl font-bold text-slate-100 sm:text-3xl">
+        <div className="ds-eyebrow mb-2">绿皮火车 · TOKEN 经济学 · 字节级 BPE</div>
+        <h1
+          className="text-3xl sm:text-4xl"
+          style={{
+            fontWeight: 250,
+            letterSpacing: "-0.02em",
+            color: "var(--ink)",
+          }}
+        >
           中文 BPE 分词可视化
-          <span className="ml-2 rounded bg-teal-500/15 px-2 py-0.5 align-middle text-sm font-medium text-teal-300">
+          <span
+            className="ml-3 align-middle text-sm font-normal"
+            style={{ color: "var(--accent)" }}
+          >
             字节级
           </span>
         </h1>
-        <p className="mt-2 text-sm text-slate-400">
-          真实大模型分词器在 <b className="text-slate-200">UTF-8 字节</b> 上做 BPE 合并。
+        <p className="mt-3 max-w-3xl text-sm leading-relaxed" style={{ color: "var(--ink-muted)" }}>
+          真实大模型分词器在 <b style={{ color: "var(--ink)" }}>UTF-8 字节</b> 上做 BPE 合并。
           一个汉字 = 3 字节，所以中文要先把字节"拼回"汉字，再继续合并——
-          这就是<b className="text-pink-300">中文比英文更费 token</b> 的根源。
+          这就是<b style={{ color: "var(--warn)" }}>中文比英文更费 token</b> 的根源。
         </p>
       </header>
 
       {/* 输入区 */}
-      <section className="mb-5 rounded-xl border border-slate-700/60 bg-slate-800/30 p-4">
+      <section className="ds-card mb-5 p-4">
         <div className="mb-2 flex flex-wrap gap-2">
           {PRESETS.map((p) => (
             <button
               key={p.label}
               onClick={() => setText(p.text)}
-              className="rounded-full border border-slate-600/70 px-3 py-1 text-xs text-slate-300 transition hover:border-teal-400/60 hover:text-teal-200"
+              className="rounded-full px-3 py-1 text-xs transition"
+              style={{
+                border: "1px solid var(--ink-faint)",
+                color: "var(--ink-muted)",
+              }}
             >
               {p.label}
             </button>
@@ -92,10 +107,18 @@ export default function App() {
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={2}
-          className="w-full resize-y rounded-lg border border-slate-700 bg-slate-900/60 p-3 text-slate-100 outline-none focus:border-teal-400/60"
+          className="w-full resize-y rounded-lg p-3 outline-none"
+          style={{
+            border: "1px solid var(--ink-faint)",
+            background: "#000",
+            color: "var(--ink)",
+          }}
           placeholder="输入要分词的文本…"
         />
-        <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-slate-400">
+        <div
+          className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs"
+          style={{ color: "var(--ink-dim)", accentColor: "var(--accent)" }}
+        >
           <label className="flex items-center gap-2">
             最大合并次数
             <input
@@ -105,7 +128,7 @@ export default function App() {
               value={maxMerges}
               onChange={(e) => setMaxMerges(Number(e.target.value))}
             />
-            <span className="w-8 tabular-nums text-slate-200">{maxMerges}</span>
+            <span className="w-8 tabular-nums" style={{ color: "var(--ink)" }}>{maxMerges}</span>
           </label>
           <label className="flex items-center gap-2">
             最小频次
@@ -116,7 +139,7 @@ export default function App() {
               value={minFrequency}
               onChange={(e) => setMinFrequency(Number(e.target.value))}
             />
-            <span className="w-6 tabular-nums text-slate-200">{minFrequency}</span>
+            <span className="w-6 tabular-nums" style={{ color: "var(--ink)" }}>{minFrequency}</span>
           </label>
           <label className="flex items-center gap-2">
             词表显示数量
@@ -127,7 +150,7 @@ export default function App() {
               value={vocabTopN}
               onChange={(e) => setVocabTopN(Number(e.target.value))}
             />
-            <span className="w-6 tabular-nums text-slate-200">{vocabTopN}</span>
+            <span className="w-6 tabular-nums" style={{ color: "var(--ink)" }}>{vocabTopN}</span>
           </label>
           <label className="flex cursor-pointer items-center gap-2">
             <input
@@ -149,20 +172,20 @@ export default function App() {
       </section>
 
       {/* 控制条 */}
-      <section className="mb-5 flex flex-wrap items-center gap-3 rounded-xl border border-slate-700/60 bg-slate-800/30 p-3">
+      <section className="ds-card mb-5 flex flex-wrap items-center gap-3 p-3">
         <button
           onClick={() => {
             setCurrent(0);
             setPlaying(false);
           }}
-          className="rounded-lg border border-slate-600 px-3 py-1.5 text-sm text-slate-200 hover:bg-slate-700/50"
+          className="ds-btn px-3 py-1.5 text-sm"
         >
           ⏮ 重置
         </button>
         <button
           onClick={() => setCurrent((c) => Math.max(0, c - 1))}
           disabled={current === 0}
-          className="rounded-lg border border-slate-600 px-3 py-1.5 text-sm text-slate-200 disabled:opacity-40 hover:bg-slate-700/50"
+          className="ds-btn px-3 py-1.5 text-sm"
         >
           ⏪ 上一步
         </button>
@@ -171,42 +194,53 @@ export default function App() {
             if (current >= lastIndex) setCurrent(0);
             setPlaying((p) => !p);
           }}
-          className="rounded-lg bg-teal-500/90 px-4 py-1.5 text-sm font-medium text-slate-900 hover:bg-teal-400"
+          className="ds-btn ds-btn--accent px-4 py-1.5 text-sm"
         >
           {playing ? "⏸ 暂停" : "▶ 播放"}
         </button>
         <button
           onClick={() => setCurrent((c) => Math.min(lastIndex, c + 1))}
           disabled={current >= lastIndex}
-          className="rounded-lg border border-slate-600 px-3 py-1.5 text-sm text-slate-200 disabled:opacity-40 hover:bg-slate-700/50"
+          className="ds-btn px-3 py-1.5 text-sm"
         >
           下一步 ⏩
         </button>
 
-        <div className="flex items-center gap-1 text-xs text-slate-400">
+        <div className="flex items-center gap-1 text-xs" style={{ color: "var(--ink-dim)" }}>
           速度
           {SPEEDS.map((s) => (
             <button
               key={s}
               onClick={() => setSpeed(s)}
-              className={`rounded px-2 py-1 ${
+              className="rounded px-2 py-1"
+              style={
                 speed === s
-                  ? "bg-teal-500/20 text-teal-200"
-                  : "text-slate-400 hover:text-slate-200"
-              }`}
+                  ? {
+                      background: "color-mix(in srgb, var(--accent) 18%, transparent)",
+                      color: "var(--accent)",
+                    }
+                  : { color: "var(--ink-dim)" }
+              }
             >
               {s}×
             </button>
           ))}
         </div>
 
-        <div className="ml-auto text-sm tabular-nums text-slate-300">
-          第 <b className="text-slate-100">{step.index}</b> / {lastIndex} 步
+        <div className="ml-auto text-sm tabular-nums" style={{ color: "var(--ink-muted)" }}>
+          第 <b style={{ color: "var(--ink)" }}>{step.index}</b> / {lastIndex} 步
         </div>
-        <div className="h-1.5 w-full overflow-hidden rounded bg-slate-700/50">
+        <div
+          className="h-1 w-full overflow-hidden rounded"
+          style={{ background: "color-mix(in srgb, var(--ink) 10%, transparent)" }}
+        >
           <div
-            className="h-full bg-teal-400 transition-all"
-            style={{ width: `${lastIndex ? (step.index / lastIndex) * 100 : 0}%` }}
+            className="h-full transition-all"
+            style={{
+              width: `${lastIndex ? (step.index / lastIndex) * 100 : 0}%`,
+              background: "var(--accent)",
+              boxShadow: "var(--glow-accent)",
+            }}
           />
         </div>
       </section>
@@ -216,20 +250,33 @@ export default function App() {
       {/* 刚刚合并提示 */}
       <div className="my-4 min-h-[2rem]">
         {step.merge ? (
-          <div className="inline-flex items-center gap-2 rounded-lg bg-green-500/10 px-3 py-1.5 text-sm text-green-200">
-            <span className="font-medium">第 {step.index} 步合并：</span>
+          <div
+            className="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm"
+            style={{
+              background: "color-mix(in srgb, var(--accent) 10%, transparent)",
+              border: "1px solid color-mix(in srgb, var(--accent) 35%, transparent)",
+              color: "var(--ink)",
+            }}
+          >
+            <span style={{ color: "var(--accent)" }}>第 {step.index} 步合并</span>
             <span className="font-mono-zh">
               {tokenText(result, step.merge.a)}
-              <span className="mx-1 text-slate-500">+</span>
+              <span className="mx-1" style={{ color: "var(--ink-dim)" }}>+</span>
               {tokenText(result, step.merge.b)}
-              <span className="mx-1 text-slate-500">→</span>
+              <span className="mx-1" style={{ color: "var(--ink-dim)" }}>→</span>
               <b>{tokenText(result, step.merge.newId)}</b>
             </span>
-            <span className="text-green-300/70">（频次 N={step.merge.count}）</span>
+            <span style={{ color: "var(--ink-dim)" }}>（频次 N={step.merge.count}）</span>
           </div>
         ) : (
-          <div className="inline-flex items-center gap-2 rounded-lg bg-slate-700/30 px-3 py-1.5 text-sm text-slate-300">
-            初始状态：每个字符已按 UTF-8 拆成裸字节（灰色 = 还不是完整字符）
+          <div
+            className="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm"
+            style={{
+              background: "color-mix(in srgb, var(--ink) 5%, transparent)",
+              color: "var(--ink-muted)",
+            }}
+          >
+            初始状态：每个字符已按 UTF-8 拆成裸字节（虚线灰块 = 还不是完整字符）
           </div>
         )}
       </div>
@@ -237,7 +284,7 @@ export default function App() {
       {/* 响应式：窄屏自上而下堆叠；≥lg 三栏并排（a 原文 / b token 序列 / c 词表+合并产物）。
           minmax(0,…) 让超长 token 行收缩换行而非撑破栏宽，支持一直放大到超宽屏。 */}
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(200px,1fr)_minmax(0,2fr)_minmax(280px,340px)]">
-        <Panel title="原文（逐字符）" className="lg:max-h-[75vh]">
+        <Panel title="原文" className="lg:max-h-[75vh]">
           <OriginalText text={text} showInfo={showCharInfo} />
         </Panel>
         <Panel title="当前 token 序列" className="lg:max-h-[75vh]">
@@ -254,10 +301,8 @@ export default function App() {
       </div>
 
       {/* BPE 步骤条：横向、全宽，显示在可视化下方 */}
-      <div className="mt-5 rounded-xl border border-slate-700/60 bg-slate-800/30 p-4">
-        <div className="mb-3 text-xs font-medium uppercase tracking-wide text-slate-400">
-          BPE 步骤（点击跳转）
-        </div>
+      <div className="ds-card mt-5 p-4">
+        <div className="ds-eyebrow ds-eyebrow--dim mb-3">BPE 步骤 · 点击跳转</div>
         <StepsBar
           steps={result.steps.slice(0, step.index + 1)}
           tokens={result.tokens}
@@ -269,8 +314,11 @@ export default function App() {
         />
       </div>
 
-      <footer className="mt-10 border-t border-slate-800 pt-4 text-center text-xs text-slate-500">
-        字节级 BPE 演示 · 绿皮火车 · 灰色块 = 半个字符的裸字节，彩色块 = 已拼成完整字符
+      <footer
+        className="mt-10 pt-4 text-center text-xs"
+        style={{ borderTop: "1px solid color-mix(in srgb, var(--ink) 10%, transparent)", color: "var(--ink-dim)" }}
+      >
+        字节级 BPE 演示 · 绿皮火车 · 虚线灰块 = 半个字符的裸字节，彩色块 = 已拼成完整字符
       </footer>
     </div>
   );
@@ -293,12 +341,8 @@ function Panel({
 }) {
   // flex 列：标题固定（shrink-0），正文在超出高度上限时自身滚动。
   return (
-    <div
-      className={`flex flex-col rounded-xl border border-slate-700/60 bg-slate-800/30 ${
-        className ?? ""
-      }`}
-    >
-      <div className="shrink-0 px-4 pt-4 pb-2 text-xs font-medium uppercase tracking-wide text-slate-400">
+    <div className={`ds-card flex flex-col ${className ?? ""}`}>
+      <div className="ds-eyebrow ds-eyebrow--dim shrink-0 px-4 pt-4 pb-2">
         {title}
       </div>
       <div className="min-h-0 overflow-y-auto px-4 pb-4">{children}</div>

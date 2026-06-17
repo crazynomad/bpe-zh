@@ -17,9 +17,9 @@ function Tk({ tok }: { tok: ByteToken }) {
       className="rounded px-1 py-0.5"
       style={{
         background: s.bg,
-        border: `1px solid ${s.border}`,
+        border: `1px ${s.dashed ? "dashed" : "solid"} ${s.border}`,
         color: s.color,
-        fontFamily: s.mono ? '"SF Mono", Menlo, Consolas, monospace' : undefined,
+        fontFamily: s.mono ? "var(--font-mono)" : undefined,
       }}
     >
       {tok.text === " " ? "␣" : tok.text}
@@ -46,36 +46,40 @@ export default function StepsBar({ steps, tokens, current, onSelect }: Props) {
           <button
             key={st.index}
             onClick={() => onSelect(st.index)}
-            className="flex w-48 shrink-0 flex-col gap-1 rounded-lg border px-2.5 py-2 text-left transition"
+            className="flex w-48 shrink-0 flex-col gap-1 px-2.5 py-2 text-left transition"
             style={{
-              borderColor: active ? "#2dd4bf" : "rgba(71,85,105,0.5)",
-              background: active ? "rgba(45,212,191,0.1)" : "rgba(15,23,42,0.3)",
+              border: `1px solid ${active ? "var(--accent)" : "var(--ink-faint)"}`,
+              borderRadius: "var(--radius-sm)",
+              background: active
+                ? "color-mix(in srgb, var(--accent) 10%, transparent)"
+                : "color-mix(in srgb, var(--ink) 3%, transparent)",
+              boxShadow: active ? "var(--glow-accent)" : undefined,
             }}
           >
             <div
-              className="text-xs font-semibold"
-              style={{ color: active ? "#5eead4" : "#cbd5e1" }}
+              className="font-mono-zh text-[11px] font-semibold uppercase"
+              style={{ letterSpacing: "0.08em", color: active ? "var(--accent)" : "var(--ink-muted)" }}
             >
-              {st.index === 0 ? "初始状态" : `第 ${st.index} 步`}
+              {st.index === 0 ? "初始" : `STEP ${st.index}`}
             </div>
 
             <div className="flex flex-wrap items-center gap-1 text-xs leading-snug">
               {m ? (
                 <>
                   <Tk tok={tokens.get(m.a)!} />
-                  <span className="text-slate-500">+</span>
+                  <span style={{ color: "var(--ink-dim)" }}>+</span>
                   <Tk tok={tokens.get(m.b)!} />
-                  <span className="text-slate-500">→</span>
+                  <span style={{ color: "var(--ink-dim)" }}>→</span>
                   <Tk tok={tokens.get(m.newId)!} />
-                  <span className="text-slate-400">出现 {m.count} 次</span>
+                  <span style={{ color: "var(--ink-dim)" }}>出现 {m.count} 次</span>
                 </>
               ) : (
-                <span className="text-slate-400">每个字符按 UTF-8 拆成裸字节</span>
+                <span style={{ color: "var(--ink-dim)" }}>每个字符按 UTF-8 拆成裸字节</span>
               )}
             </div>
 
-            <div className="text-[11px] tabular-nums text-slate-500">
-              token 数 {st.tokenIds.length} ｜ 词表 {st.vocabSize}
+            <div className="font-mono-zh text-[11px] tabular-nums" style={{ color: "var(--ink-dim)" }}>
+              token {st.tokenIds.length} ｜ 词表 {st.vocabSize}
             </div>
           </button>
         );

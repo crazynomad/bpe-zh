@@ -1,26 +1,32 @@
 import type { ByteToken } from "./bpe";
 
-// 给"已凑成完整字符"的 token 按 id 取一个稳定色相：同一个 token 永远同色，
-// 便于观众看出反复被合并出来的大单元。半个字符的裸字节统一用灰色。
+// Stage Dusk 冷区 token 配色。对齐品牌 ds-token 语汇：
+//  - 半个字符的裸字节  → ds-token--ghost（虚线、ink-dim），表示"还没成形"
+//  - 标点              → 弱化（ink-dim）
+//  - 完整单字节 ASCII  → AI 蓝 accent-2
+//  - 完整多字节字符    → 按 id 取稳定色相（功能性：同 token 同色），调到暗舞台上耐看
 export interface ChipStyle {
   bg: string;
   border: string;
   color: string;
   mono: boolean;
+  dashed?: boolean;
 }
 
+// 半字节裸字节：品牌 ghost 槽（虚线边、暗字、透明底）
 const PARTIAL: ChipStyle = {
-  bg: "rgba(148,163,184,0.12)",
-  border: "rgba(148,163,184,0.35)",
-  color: "#94a3b8",
+  bg: "transparent",
+  border: "rgba(106,112,128,0.55)",
+  color: "#6a7080",
   mono: true,
+  dashed: true,
 };
 
-// 弱化样式：用于标点符号，降低存在感，让注意力集中在文字内容上。
+// 标点弱化
 const MUTED: ChipStyle = {
   bg: "transparent",
-  border: "rgba(100,116,139,0.25)",
-  color: "#64748b",
+  border: "rgba(106,112,128,0.3)",
+  color: "#6a7080",
   mono: false,
 };
 
@@ -33,23 +39,24 @@ export function chipStyle(token: ByteToken): ChipStyle {
   if (!token.complete) return PARTIAL;
   if (isPunctuation(token.text)) return MUTED;
 
-  // 基础 ASCII（单字节完整字符）用低饱和的蓝灰，和"合并产物"区分开
+  // 完整单字节 ASCII → AI 蓝（accent-2）
   if (token.bytes.length === 1) {
     return {
-      bg: "rgba(96,165,250,0.14)",
-      border: "rgba(96,165,250,0.4)",
+      bg: "color-mix(in srgb, #60a5fa 10%, #0a0a0c)",
+      border: "rgba(96,165,250,0.45)",
       color: "#bfdbfe",
       mono: true,
     };
   }
 
-  // 多字节完整 token：按 id 散列取色相；字节越多越饱和（合并得越多 = 越"成形"）
+  // 完整多字节 token：按 id 散列取色相；字节越多越饱和（合并得越多 = 越"成形"）。
+  // 限定在青—蓝—紫—琥珀的暖冷区间，避开品牌否决的蓝紫渐变滥用，整体贴合暗舞台。
   const hue = (token.id * 47) % 360;
-  const sat = Math.min(70, 38 + token.bytes.length * 6);
+  const sat = Math.min(60, 34 + token.bytes.length * 5);
   return {
-    bg: `hsl(${hue} ${sat}% 22% / 0.85)`,
-    border: `hsl(${hue} ${sat}% 55%)`,
-    color: `hsl(${hue} ${Math.min(90, sat + 25)}% 82%)`,
+    bg: `hsl(${hue} ${sat}% 16% / 0.9)`,
+    border: `hsl(${hue} ${sat}% 52%)`,
+    color: `hsl(${hue} ${Math.min(85, sat + 28)}% 80%)`,
     mono: false,
   };
 }

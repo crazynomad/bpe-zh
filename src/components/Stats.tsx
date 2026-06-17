@@ -5,12 +5,46 @@ interface Props {
   byteLength: number;
 }
 
-function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
+// ds-data-card / ds-stat 语汇：mono kicker（大写）→ 细体大数字（accent 单位）→ mono 小注。
+function Stat({
+  label,
+  value,
+  unit,
+  hint,
+  accent,
+}: {
+  label: string;
+  value: string;
+  unit?: string;
+  hint?: string;
+  accent?: boolean;
+}) {
   return (
-    <div className="rounded-lg border border-slate-700/60 bg-slate-800/40 px-3 py-2">
-      <div className="text-[11px] text-slate-400">{label}</div>
-      <div className="text-lg font-semibold tabular-nums text-slate-100">{value}</div>
-      {hint && <div className="text-[10px] text-slate-500">{hint}</div>}
+    <div
+      className="ds-card px-4 py-3"
+      style={
+        accent
+          ? { borderColor: "var(--accent)", background: "color-mix(in srgb, var(--accent) 6%, var(--bg-lifted))" }
+          : undefined
+      }
+    >
+      <div className="ds-eyebrow ds-eyebrow--dim">{label}</div>
+      <div
+        className="mt-1 tabular-nums"
+        style={{ fontSize: "30px", fontWeight: 250, letterSpacing: "-0.02em", color: "var(--ink)", lineHeight: 1 }}
+      >
+        {value}
+        {unit && (
+          <span style={{ fontSize: "16px", fontWeight: 350, color: "var(--accent)", marginLeft: 4 }}>
+            {unit}
+          </span>
+        )}
+      </div>
+      {hint && (
+        <div className="mt-1 font-mono-zh text-[10px]" style={{ color: "var(--ink-dim)" }}>
+          {hint}
+        </div>
+      )}
     </div>
   );
 }
@@ -20,10 +54,10 @@ export default function Stats({ step, byteLength }: Props) {
   const ratio = tokenCount > 0 ? byteLength / tokenCount : 0;
 
   return (
-    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
       <Stat label="原始字节数" value={String(byteLength)} hint="UTF-8 编码后" />
       <Stat label="当前 token 数" value={String(tokenCount)} hint={`第 ${step.index} 步`} />
-      <Stat label="压缩率" value={`${ratio.toFixed(2)}×`} hint="字节 ÷ token" />
+      <Stat label="压缩率" value={ratio.toFixed(2)} unit="×" hint="字节 ÷ token" accent />
       <Stat label="词表大小" value={String(step.vocabSize)} hint="基础字节 + 合并数" />
     </div>
   );

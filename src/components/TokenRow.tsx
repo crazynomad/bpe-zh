@@ -37,18 +37,19 @@ export default function TokenRow({ step, tokens, showIds }: Props) {
         return (
           <span
             key={i}
-            className="inline-flex flex-col items-center rounded-md px-2 py-1 text-sm leading-tight transition-all"
+            className="inline-flex flex-col items-center px-2 py-1 text-sm leading-tight transition-all"
             style={{
               background: s.bg,
-              border: `1px solid ${isNext ? "#fbbf24" : s.border}`,
+              border: `1px ${s.dashed ? "dashed" : "solid"} ${
+                isNext ? "var(--warn)" : s.border
+              }`,
+              borderRadius: "var(--radius-sm)",
               color: s.color,
-              fontFamily: s.mono
-                ? '"SF Mono", Menlo, Consolas, monospace'
-                : undefined,
+              fontFamily: s.mono ? "var(--font-mono)" : undefined,
               boxShadow: isJustMerged
-                ? "0 0 0 2px rgba(34,197,94,0.6), 0 0 12px rgba(34,197,94,0.35)"
+                ? "0 0 0 1.5px var(--accent), var(--glow-accent)"
                 : isNext
-                ? "0 0 0 1px rgba(251,191,36,0.5)"
+                ? "0 0 0 1px color-mix(in srgb, var(--warn) 55%, transparent)"
                 : undefined,
             }}
             title={`token #${id} · ${tok.bytes.length} 字节 · 字节 [${tok.bytes

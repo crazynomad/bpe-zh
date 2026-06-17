@@ -37,29 +37,33 @@ export default function VocabularyTable({ step, tokens, topN }: Props) {
         return (
           <div key={id} className="flex items-center gap-2">
             <span
-              className="inline-flex items-center rounded-md px-2 py-0.5 text-sm"
+              className="inline-flex items-center px-2 py-0.5 text-sm"
               style={{
                 background: s.bg,
-                border: `1px solid ${s.border}`,
+                border: `1px ${s.dashed ? "dashed" : "solid"} ${s.border}`,
+                borderRadius: "var(--radius-sm)",
                 color: s.color,
-                fontFamily: s.mono ? '"SF Mono", Menlo, Consolas, monospace' : undefined,
+                fontFamily: s.mono ? "var(--font-mono)" : undefined,
               }}
               title={`token #${id} · ${tok.bytes.length} 字节`}
             >
               {tok.text === " " ? "␣" : tok.text}
             </span>
             {isBase && (
-              <span className="rounded bg-slate-700/50 px-1 text-[10px] text-slate-400">
+              <span
+                className="rounded px-1 text-[10px]"
+                style={{ background: "color-mix(in srgb, var(--ink) 8%, transparent)", color: "var(--ink-dim)" }}
+              >
                 基础
               </span>
             )}
-            <span className="ml-auto text-xs tabular-nums text-slate-300">
+            <span className="ml-auto font-mono-zh text-xs tabular-nums" style={{ color: "var(--accent)" }}>
               {count} 次
             </span>
           </div>
         );
       })}
-      <div className="pt-1 text-[11px] text-slate-500">
+      <div className="pt-1 font-mono-zh text-[11px]" style={{ color: "var(--ink-dim)" }}>
         当前在用 {inUse.length} 个 token{inUse.length > topN ? `（仅显示前 ${topN}）` : ""}
       </div>
     </div>
