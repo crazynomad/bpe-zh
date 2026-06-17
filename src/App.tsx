@@ -56,7 +56,7 @@ export default function App() {
   const step = result.steps[Math.min(current, lastIndex)];
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <div className="mx-auto max-w-7xl px-4 py-8">
       <header className="mb-6">
         <h1 className="text-2xl font-bold text-slate-100 sm:text-3xl">
           中文 BPE 分词可视化
@@ -211,15 +211,14 @@ export default function App() {
         )}
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_280px]">
-        <div className="space-y-5">
-          <Panel title="原文（按字符，标注字节数）">
-            <OriginalText text={text} />
-          </Panel>
-          <Panel title="当前 token 序列">
-            <TokenRow step={step} tokens={result.tokens} showIds={showIds} />
-          </Panel>
-        </div>
+      {/* viewport 足够宽（xl）时三栏并排；否则自上而下堆叠 */}
+      <div className="grid items-start gap-4 xl:grid-cols-[1fr_1.5fr_300px]">
+        <Panel title="原文（按字符，标注字节数）">
+          <OriginalText text={text} />
+        </Panel>
+        <Panel title="当前 token 序列">
+          <TokenRow step={step} tokens={result.tokens} showIds={showIds} />
+        </Panel>
         <Panel title="相邻对频率表">
           <FrequencyTable step={step} tokens={result.tokens} />
         </Panel>
