@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { trainBPE } from "./bpe";
 import TokenRow from "./components/TokenRow";
 import FrequencyTable from "./components/FrequencyTable";
+import MergeProduct from "./components/MergeProduct";
 import Stats from "./components/Stats";
 import OriginalText from "./components/OriginalText";
 
@@ -202,7 +203,7 @@ export default function App() {
               <span className="mx-1 text-slate-500">→</span>
               <b>{tokenText(result, step.merge.newId)}</b>
             </span>
-            <span className="text-green-300/70">（出现 {step.merge.count} 次）</span>
+            <span className="text-green-300/70">（频次 N={step.merge.count}）</span>
           </div>
         ) : (
           <div className="inline-flex items-center gap-2 rounded-lg bg-slate-700/30 px-3 py-1.5 text-sm text-slate-300">
@@ -219,9 +220,14 @@ export default function App() {
         <Panel title="当前 token 序列">
           <TokenRow step={step} tokens={result.tokens} showIds={showIds} />
         </Panel>
-        <Panel title="相邻对频率表">
-          <FrequencyTable step={step} tokens={result.tokens} />
-        </Panel>
+        <div className="space-y-4">
+          <Panel title="本步合并产物">
+            <MergeProduct step={step} tokens={result.tokens} />
+          </Panel>
+          <Panel title="相邻对频率表">
+            <FrequencyTable step={step} tokens={result.tokens} />
+          </Panel>
+        </div>
       </div>
 
       <footer className="mt-10 border-t border-slate-800 pt-4 text-center text-xs text-slate-500">

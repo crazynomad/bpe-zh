@@ -21,7 +21,9 @@ export interface MergeEvent {
   a: number;
   b: number;
   newId: number;
-  count: number;
+  count: number; // N：合并前该相邻对的频次（被选中的理由，频率表榜首）
+  resultCount: number; // K：合并后新 token 在序列中实际出现的次数
+  // 通常 N === K；但周期性重复（如 AAAA）时相邻计数允许重叠 → N 略大于不重叠合并出的 K。
 }
 
 export interface Step {
@@ -132,12 +134,13 @@ export function trainBPE(text: string, options: Partial<TrainOptions> = {}): Bpe
     tokens.set(newId, { id: newId, bytes: newBytes, text: d.text, complete: d.complete });
 
     seq = applyMerge(seq, best.a, best.b, newId);
+    const resultCount = seq.reduce((n, id) => n + (id === newId ? 1 : 0), 0);
 
     steps.push({
       index: m + 1,
       tokenIds: seq.slice(),
       vocabSize: distinctBytes + (m + 1),
-      merge: { a: best.a, b: best.b, newId, count: best.count },
+      merge: { a: best.a, b: best.b, newId, count: best.count, resultCount },
       topPairs: countPairs(seq),
     });
   }
