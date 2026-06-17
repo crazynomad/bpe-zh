@@ -7,6 +7,10 @@ interface Props {
   showIds: boolean;
 }
 
+// 渲染上限：超长文本（如整篇论文）只画前 CAP 个 token，避免上万 DOM 节点卡顿。
+// 训练仍在全文上进行，统计/压缩率反映完整文本，这里只折叠"看得见的"部分。
+const CAP = 1500;
+
 // 渲染当前 token 序列。两类高亮：
 //  1) 刚刚被合并出来的新 token（step.merge.newId）→ 绿色脉冲环
 //  2) 下一步将被合并的相邻对（step.topPairs[0]）→ 黄色描边，和频率表呼应
@@ -27,9 +31,12 @@ export default function TokenRow({ step, tokens, showIds }: Props) {
     }
   }
 
+  const shown = step.tokenIds.length > CAP ? step.tokenIds.slice(0, CAP) : step.tokenIds;
+  const hidden = step.tokenIds.length - shown.length;
+
   return (
     <div className="flex flex-wrap gap-1.5">
-      {step.tokenIds.map((id, i) => {
+      {shown.map((id, i) => {
         const tok = tokens.get(id)!;
         const s = chipStyle(tok);
         const isJustMerged = id === justMergedId;
@@ -65,6 +72,15 @@ export default function TokenRow({ step, tokens, showIds }: Props) {
           </span>
         );
       })}
+      {hidden > 0 && (
+        <span
+          className="inline-flex items-center px-2 py-1 text-xs"
+          style={{ color: "var(--ink-dim)" }}
+          title="超长文本只渲染前 1500 个 token；训练与统计仍基于完整文本"
+        >
+          …还有 {hidden} 个 token（已折叠）
+        </span>
+      )}
     </div>
   );
 }

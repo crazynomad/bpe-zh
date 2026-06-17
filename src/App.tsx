@@ -6,58 +6,7 @@ import MergeProduct from "./components/MergeProduct";
 import StepsBar from "./components/StepsBar";
 import Stats from "./components/Stats";
 import OriginalText from "./components/OriginalText";
-
-// —— 范本文本 ——
-const DREAM_EN = `I say to you today, my friends, so even though we face the difficulties of today and tomorrow, I still have a dream. It is a dream deeply rooted in the American dream.
-
-I have a dream that one day this nation will rise up and live out the true meaning of its creed: "We hold these truths to be self-evident, that all men are created equal."
-
-I have a dream that one day on the red hills of Georgia, the sons of former slaves and the sons of former slave owners will be able to sit down together at the table of brotherhood.
-
-I have a dream that one day even the state of Mississippi, a state sweltering with the heat of injustice, sweltering with the heat of oppression, will be transformed into an oasis of freedom and justice.
-
-I have a dream that my four little children will one day live in a nation where they will not be judged by the color of their skin but by the content of their character.
-
-I have a dream today!`;
-
-const DREAM_ZH = `朋友们，今天我要对你们说，尽管眼前和未来我们仍面临着重重困难，但我依然有一个梦想。这个梦想深深根植于美国梦之中。
-
-我梦想有一天，这个国家会站立起来，真正实现其信条的真谛：“我们认为这些真理是不言而喻的：人人生而平等。”
-
-我梦想有一天，在佐治亚州的红山上，昔日奴隶的儿子能够与昔日奴隶主的儿子同席而坐，共叙兄弟情谊。
-
-我梦想有一天，甚至连密西西比州这个正被不公的烈火烤炙、被压迫的狂热蹂躏的荒凉之州，也能蜕变为自由和正义的绿洲。
-
-我梦想有一天，我的四个孩子将生活在一个不以肤色、而以品格优劣来评判他们的国度里。
-
-今天，我有一个梦想！`;
-
-const JOBS = `Stay hungry. Stay foolish.
-
-Your time is limited, so don't waste it living someone else's life. Don't be trapped by dogma, which is living with the results of other people's thinking.
-
-The people who are crazy enough to think they can change the world are the ones who do.
-
-Design is not just what it looks like and feels like. Design is how it works.
-
-Innovation distinguishes between a leader and a follower.
-
-Remembering that you are going to die is the best way I know to avoid the trap of thinking you have something to lose. You are already naked. There is no reason not to follow your heart.`;
-
-const ATTENTION_EN = `The dominant sequence transduction models are based on complex recurrent or convolutional neural networks that include an encoder and a decoder. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train.`;
-
-const ATTENTION_ZH = `主流的序列转换模型大多建立在包含编码器和解码器的复杂循环或卷积神经网络之上。性能最好的模型还会通过注意力机制将编码器和解码器连接起来。我们提出一种全新的简单网络架构——Transformer，它完全基于注意力机制，彻底摒弃了循环与卷积。在两项机器翻译任务上的实验表明，这些模型不仅质量更优，而且更易并行化，所需的训练时间也大幅减少。`;
-
-const PRESETS: { label: string; text: string }[] = [
-  { label: "I Have a Dream · 英", text: DREAM_EN },
-  { label: "I Have a Dream · 双语", text: `${DREAM_EN}\n\n${DREAM_ZH}` },
-  { label: "乔布斯经典名句", text: JOBS },
-  { label: "Attention Is All You Need · 英", text: ATTENTION_EN },
-  { label: "Attention Is All You Need · 双语", text: `${ATTENTION_EN}\n\n${ATTENTION_ZH}` },
-  { label: "春 · 朱自清", text: "盼望着，盼望着，东风来了，春天的脚步近了。一切都像刚睡醒的样子，欣欣然张开了眼。" },
-];
-
-const DEFAULT_TEXT = PRESETS[0].text;
+import { PRESETS, DEFAULT_TEXT } from "./presets";
 
 const SPEEDS = [0.5, 1, 2, 4];
 
@@ -115,7 +64,7 @@ export default function App() {
             color: "var(--ink)",
           }}
         >
-          中文 BPE 分词可视化
+          BPE（Byte Pair Encoding）分词可视化
           <span
             className="ml-3 align-middle text-sm font-normal"
             style={{ color: "var(--accent)" }}
@@ -288,48 +237,52 @@ export default function App() {
       {/* 响应式：窄屏自上而下堆叠；≥lg 三栏并排（a 原文 / b token 序列 / c 词表+合并产物）。
           minmax(0,…) 让超长 token 行收缩换行而非撑破栏宽，支持一直放大到超宽屏。 */}
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(200px,1fr)_minmax(0,2fr)_minmax(280px,340px)]">
-        <Panel title="原文（可编辑）" className="lg:max-h-[75vh]">
-          {/* 范本：点选即填入 */}
-          <div className="mb-3 flex flex-wrap gap-1.5">
-            {PRESETS.map((p) => (
-              <button
-                key={p.label}
-                onClick={() => setText(p.text)}
-                className="rounded-full px-2.5 py-1 text-[11px] transition"
-                style={{
-                  border: `1px solid ${text === p.text ? "var(--accent)" : "var(--ink-faint)"}`,
-                  color: text === p.text ? "var(--accent)" : "var(--ink-muted)",
-                }}
-              >
-                {p.label}
-              </button>
-            ))}
-          </div>
+        <Panel title="原文（可编辑）" className="lg:h-[75vh]">
+          <div className="flex h-full flex-col">
+            {/* 范本：点选即填入 */}
+            <div className="mb-3 flex shrink-0 flex-wrap gap-1.5">
+              {PRESETS.map((p) => (
+                <button
+                  key={p.label}
+                  onClick={() => setText(p.text)}
+                  className="rounded-full px-2.5 py-1 text-[11px] transition"
+                  style={{
+                    border: `1px solid ${text === p.text ? "var(--accent)" : "var(--ink-faint)"}`,
+                    color: text === p.text ? "var(--accent)" : "var(--ink-muted)",
+                  }}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
 
-          {showCharInfo ? (
-            <>
-              <div
-                className="mb-2 rounded px-2 py-1 text-[11px]"
-                style={{
-                  background: "color-mix(in srgb, var(--warn) 12%, transparent)",
-                  color: "var(--warn)",
-                }}
-              >
-                只读模式：取消「显示字符编码」即可继续编辑
-              </div>
-              <OriginalText text={text} />
-            </>
-          ) : (
-            <textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              className="w-full resize-none text-base leading-relaxed outline-none"
-              style={{ background: "transparent", color: "var(--ink)", minHeight: "200px" }}
-              placeholder="在这里输入或粘贴要分词的文本，也可以点上面的范本…"
-            />
-          )}
+            {showCharInfo ? (
+              <>
+                <div
+                  className="mb-2 shrink-0 rounded px-2 py-1 text-[11px]"
+                  style={{
+                    background: "color-mix(in srgb, var(--warn) 12%, transparent)",
+                    color: "var(--warn)",
+                  }}
+                >
+                  只读模式：取消「显示字符编码」即可继续编辑
+                </div>
+                <div className="min-h-0 flex-1 overflow-y-auto">
+                  <OriginalText text={text} />
+                </div>
+              </>
+            ) : (
+              <textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                className="w-full flex-1 resize-none text-base leading-relaxed outline-none"
+                style={{ background: "transparent", color: "var(--ink)", minHeight: "200px" }}
+                placeholder="在这里输入或粘贴要分词的文本，也可以点上面的范本…"
+              />
+            )}
+          </div>
         </Panel>
-        <Panel title="当前 token 序列" className="lg:max-h-[75vh]">
+        <Panel title="当前 token 序列" className="lg:h-[75vh]">
           <TokenRow step={step} tokens={result.tokens} showIds={showIds} />
         </Panel>
         <div className="flex flex-col gap-4 lg:max-h-[75vh]">
@@ -387,7 +340,7 @@ function Panel({
       <div className="ds-eyebrow ds-eyebrow--dim shrink-0 px-4 pt-4 pb-2">
         {title}
       </div>
-      <div className="min-h-0 overflow-y-auto px-4 pb-4">{children}</div>
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">{children}</div>
     </div>
   );
 }

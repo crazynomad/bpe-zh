@@ -8,8 +8,12 @@ const enc = new TextEncoder();
 
 // 逐字符 Unicode 方格（只读）。背景按字节数着色，下标显示 Unicode 码位与字节数。
 // 自然文本编辑由上层的 textarea 负责，这里只负责"字符透视"视图。
+const CAP = 1500;
+
 export default function OriginalText({ text }: Props) {
-  const chars = Array.from(text); // 按码点切分，emoji 也安全
+  const all = Array.from(text); // 按码点切分，emoji 也安全
+  const chars = all.length > CAP ? all.slice(0, CAP) : all;
+  const hidden = all.length - chars.length;
 
   return (
     <div className="flex flex-wrap gap-1">
@@ -50,6 +54,11 @@ export default function OriginalText({ text }: Props) {
           </span>
         );
       })}
+      {hidden > 0 && (
+        <span className="self-center px-2 text-xs" style={{ color: "var(--ink-dim)" }}>
+          …还有 {hidden} 个字符（已折叠）
+        </span>
+      )}
     </div>
   );
 }
