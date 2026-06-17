@@ -8,21 +8,38 @@ import Stats from "./components/Stats";
 import OriginalText from "./components/OriginalText";
 
 const PRESETS: { label: string; text: string }[] = [
-  { label: "重复词", text: "你好你好你好你好" },
-  { label: "古诗", text: "床前明月光，疑是地上霜。" },
-  { label: "中英混合", text: "用 GPT 做 AI 应用，AI 真有意思。" },
-  { label: "机器学习", text: "机器学习改变世界，机器学习无处不在。" },
-  { label: "英文对照", text: "the quick brown fox the lazy dog" },
+  {
+    label: "I Have a Dream · 英",
+    text: "I have a dream that my four little children will one day live in a nation where they will not be judged by the color of their skin but by the content of their character. I have a dream today!",
+  },
+  {
+    label: "I Have a Dream · 双语",
+    text: "I have a dream that my four little children will one day live in a nation where they will not be judged by the color of their skin but by the content of their character.\n我有一个梦想，有一天我的四个孩子将生活在一个不以肤色、而以品格来评判他们的国度。",
+  },
+  {
+    label: "葛底斯堡演说 · 双语",
+    text: "Four score and seven years ago our fathers brought forth on this continent a new nation, conceived in liberty, and dedicated to the proposition that all men are created equal.\n八十七年前，我们的先辈在这片大陆上创建了一个新国家：她孕育于自由，奉行人人生而平等的信念。",
+  },
+  {
+    label: "故乡 · 鲁迅",
+    text: "我想：希望是本无所谓有，无所谓无的。这正如地上的路；其实地上本没有路，走的人多了，也便成了路。",
+  },
+  {
+    label: "春 · 朱自清",
+    text: "盼望着，盼望着，东风来了，春天的脚步近了。一切都像刚睡醒的样子，欣欣然张开了眼。",
+  },
 ];
+
+const DEFAULT_TEXT = PRESETS[0].text;
 
 const SPEEDS = [0.5, 1, 2, 4];
 
 export default function App() {
-  const [text, setText] = useState("机器学习改变世界，机器学习无处不在。");
+  const [text, setText] = useState(DEFAULT_TEXT);
   const [maxMerges, setMaxMerges] = useState(60);
   const [minFrequency, setMinFrequency] = useState(2);
   const [showIds, setShowIds] = useState(false);
-  const [showCharInfo, setShowCharInfo] = useState(true);
+  const [showCharInfo, setShowCharInfo] = useState(false);
   const [vocabTopN, setVocabTopN] = useState(10);
 
   const [current, setCurrent] = useState(0);
@@ -80,99 +97,15 @@ export default function App() {
           </span>
         </h1>
         <p className="mt-3 max-w-3xl text-sm leading-relaxed" style={{ color: "var(--ink-muted)" }}>
-          真实大模型分词器在 <b style={{ color: "var(--ink)" }}>UTF-8 字节</b> 上做 BPE 合并。
-          一个汉字 = 3 字节，所以中文要先把字节"拼回"汉字，再继续合并——
-          这就是<b style={{ color: "var(--warn)" }}>中文比英文更费 token</b> 的根源。
+          把任意中英文文本，按真实大模型的方式逐步切成 token —— 看 <b style={{ color: "var(--ink)" }}>BPE</b> 如何从 UTF-8 字节一步步拼出字与词。
+        </p>
+        <p className="mt-2 text-sm italic" style={{ color: "var(--ink-dim)" }}>
+          “可视化的目的是洞察，而非图像。” —— Ben Shneiderman
         </p>
       </header>
 
-      {/* 输入区 */}
-      <section className="ds-card mb-5 p-4">
-        <div className="mb-2 flex flex-wrap gap-2">
-          {PRESETS.map((p) => (
-            <button
-              key={p.label}
-              onClick={() => setText(p.text)}
-              className="rounded-full px-3 py-1 text-xs transition"
-              style={{
-                border: "1px solid var(--ink-faint)",
-                color: "var(--ink-muted)",
-              }}
-            >
-              {p.label}
-            </button>
-          ))}
-        </div>
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          rows={2}
-          className="w-full resize-y rounded-lg p-3 outline-none"
-          style={{
-            border: "1px solid var(--ink-faint)",
-            background: "#000",
-            color: "var(--ink)",
-          }}
-          placeholder="输入要分词的文本…"
-        />
-        <div
-          className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs"
-          style={{ color: "var(--ink-dim)", accentColor: "var(--accent)" }}
-        >
-          <label className="flex items-center gap-2">
-            最大合并次数
-            <input
-              type="range"
-              min={1}
-              max={120}
-              value={maxMerges}
-              onChange={(e) => setMaxMerges(Number(e.target.value))}
-            />
-            <span className="w-8 tabular-nums" style={{ color: "var(--ink)" }}>{maxMerges}</span>
-          </label>
-          <label className="flex items-center gap-2">
-            最小频次
-            <input
-              type="range"
-              min={2}
-              max={8}
-              value={minFrequency}
-              onChange={(e) => setMinFrequency(Number(e.target.value))}
-            />
-            <span className="w-6 tabular-nums" style={{ color: "var(--ink)" }}>{minFrequency}</span>
-          </label>
-          <label className="flex items-center gap-2">
-            词表显示数量
-            <input
-              type="range"
-              min={5}
-              max={30}
-              value={vocabTopN}
-              onChange={(e) => setVocabTopN(Number(e.target.value))}
-            />
-            <span className="w-6 tabular-nums" style={{ color: "var(--ink)" }}>{vocabTopN}</span>
-          </label>
-          <label className="flex cursor-pointer items-center gap-2">
-            <input
-              type="checkbox"
-              checked={showCharInfo}
-              onChange={(e) => setShowCharInfo(e.target.checked)}
-            />
-            显示字符编码（Unicode）
-          </label>
-          <label className="flex cursor-pointer items-center gap-2">
-            <input
-              type="checkbox"
-              checked={showIds}
-              onChange={(e) => setShowIds(e.target.checked)}
-            />
-            显示 token id
-          </label>
-        </div>
-      </section>
-
-      {/* 控制条 */}
-      <section className="ds-card mb-5 flex flex-wrap items-center gap-3 p-3">
+      {/* 控制台（参数 + 播放整合在一张卡）*/}
+      <section className="ds-card mb-5 p-3"><div className="flex flex-wrap items-center gap-3">
         <button
           onClick={() => {
             setCurrent(0);
@@ -243,6 +176,50 @@ export default function App() {
             }}
           />
         </div>
+        </div>
+
+        {/* 第二行：参数旋钮 + 开关 */}
+        <div
+          className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 border-t pt-3 text-xs"
+          style={{
+            color: "var(--ink-dim)",
+            accentColor: "var(--accent)",
+            borderColor: "color-mix(in srgb, var(--ink) 10%, transparent)",
+          }}
+        >
+          <label className="flex items-center gap-2">
+            最大合并次数
+            <input type="range" min={1} max={120} value={maxMerges} onChange={(e) => setMaxMerges(Number(e.target.value))} />
+            <span className="w-8 tabular-nums" style={{ color: "var(--ink)" }}>{maxMerges}</span>
+          </label>
+          <label className="flex items-center gap-2">
+            最小频次
+            <input type="range" min={2} max={8} value={minFrequency} onChange={(e) => setMinFrequency(Number(e.target.value))} />
+            <span className="w-6 tabular-nums" style={{ color: "var(--ink)" }}>{minFrequency}</span>
+          </label>
+          <label className="flex items-center gap-2">
+            词表显示数量
+            <input type="range" min={5} max={30} value={vocabTopN} onChange={(e) => setVocabTopN(Number(e.target.value))} />
+            <span className="w-6 tabular-nums" style={{ color: "var(--ink)" }}>{vocabTopN}</span>
+          </label>
+          <label
+            className="flex items-center gap-2"
+            style={{ cursor: text.length === 0 ? "not-allowed" : "pointer", opacity: text.length === 0 ? 0.4 : 1 }}
+            title={text.length === 0 ? "先输入文本才能查看字符编码" : "切到只读的逐字符 Unicode 视图"}
+          >
+            <input
+              type="checkbox"
+              checked={showCharInfo}
+              disabled={text.length === 0}
+              onChange={(e) => setShowCharInfo(e.target.checked)}
+            />
+            显示字符编码（Unicode）
+          </label>
+          <label className="flex cursor-pointer items-center gap-2">
+            <input type="checkbox" checked={showIds} onChange={(e) => setShowIds(e.target.checked)} />
+            显示 token id
+          </label>
+        </div>
       </section>
 
       <Stats step={step} byteLength={result.byteLength} />
@@ -284,8 +261,46 @@ export default function App() {
       {/* 响应式：窄屏自上而下堆叠；≥lg 三栏并排（a 原文 / b token 序列 / c 词表+合并产物）。
           minmax(0,…) 让超长 token 行收缩换行而非撑破栏宽，支持一直放大到超宽屏。 */}
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(200px,1fr)_minmax(0,2fr)_minmax(280px,340px)]">
-        <Panel title="原文" className="lg:max-h-[75vh]">
-          <OriginalText text={text} showInfo={showCharInfo} />
+        <Panel title="原文（可编辑）" className="lg:max-h-[75vh]">
+          {/* 范本：点选即填入 */}
+          <div className="mb-3 flex flex-wrap gap-1.5">
+            {PRESETS.map((p) => (
+              <button
+                key={p.label}
+                onClick={() => setText(p.text)}
+                className="rounded-full px-2.5 py-1 text-[11px] transition"
+                style={{
+                  border: `1px solid ${text === p.text ? "var(--accent)" : "var(--ink-faint)"}`,
+                  color: text === p.text ? "var(--accent)" : "var(--ink-muted)",
+                }}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+
+          {showCharInfo ? (
+            <>
+              <div
+                className="mb-2 rounded px-2 py-1 text-[11px]"
+                style={{
+                  background: "color-mix(in srgb, var(--warn) 12%, transparent)",
+                  color: "var(--warn)",
+                }}
+              >
+                只读模式：取消「显示字符编码」即可继续编辑
+              </div>
+              <OriginalText text={text} />
+            </>
+          ) : (
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              className="w-full resize-none text-base leading-relaxed outline-none"
+              style={{ background: "transparent", color: "var(--ink)", minHeight: "200px" }}
+              placeholder="在这里输入或粘贴要分词的文本，也可以点上面的范本…"
+            />
+          )}
         </Panel>
         <Panel title="当前 token 序列" className="lg:max-h-[75vh]">
           <TokenRow step={step} tokens={result.tokens} showIds={showIds} />

@@ -2,25 +2,13 @@ import { isPunctuation } from "../colors";
 
 interface Props {
   text: string;
-  showInfo: boolean; // 关：自然文本流；开：逐字符方格 + Unicode 码位 + 字节数
 }
 
 const enc = new TextEncoder();
 
-export default function OriginalText({ text, showInfo }: Props) {
-  // 默认模式：自然文本流（像正常段落一样读），不拆方格。
-  if (!showInfo) {
-    return (
-      <p
-        className="whitespace-pre-wrap break-all text-base leading-relaxed"
-        style={{ color: "var(--ink)" }}
-      >
-        {text}
-      </p>
-    );
-  }
-
-  // 显示字符编码模式：逐字符方格，背景按字节数着色，下标显示 Unicode 码位与字节数。
+// 逐字符 Unicode 方格（只读）。背景按字节数着色，下标显示 Unicode 码位与字节数。
+// 自然文本编辑由上层的 textarea 负责，这里只负责"字符透视"视图。
+export default function OriginalText({ text }: Props) {
   const chars = Array.from(text); // 按码点切分，emoji 也安全
 
   return (
