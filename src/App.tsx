@@ -59,7 +59,7 @@ export default function App() {
   const step = result.steps[Math.min(current, lastIndex)];
 
   return (
-    <div className="mx-auto w-full max-w-[1680px] px-4 py-8 2xl:px-8">
+    <div className="mx-auto w-full max-w-[1680px] px-4 py-8 2xl:max-w-[2240px] 2xl:px-8">
       <header className="mb-6">
         <h1 className="text-2xl font-bold text-slate-100 sm:text-3xl">
           中文 BPE 分词可视化

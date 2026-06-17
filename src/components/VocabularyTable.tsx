@@ -23,8 +23,9 @@ export default function VocabularyTable({ step, tokens, topN }: Props) {
   // 基础 token（原始切分）：词表里 id < 256 的，按字节值升序
   const base = [...tokens.keys()].filter((id) => id < 256).sort((a, b) => a - b);
 
-  const rows = [...merged, ...base].slice(0, topN);
-  const totalVocab = merged.length + base.length;
+  // 只保留"当前序列里还在用"的 token（频次 > 0）：已被吸收进更大 token 的中间产物不再展示，避免迷惑。
+  const inUse = [...merged, ...base].filter((id) => (freq.get(id) ?? 0) > 0);
+  const rows = inUse.slice(0, topN);
 
   return (
     <div className="space-y-1.5">
@@ -32,7 +33,6 @@ export default function VocabularyTable({ step, tokens, topN }: Props) {
         const tok = tokens.get(id)!;
         const s = chipStyle(tok);
         const count = freq.get(id) ?? 0;
-        const gone = count === 0;
         const isBase = id < 256;
         return (
           <div key={id} className="flex items-center gap-2">
@@ -43,7 +43,6 @@ export default function VocabularyTable({ step, tokens, topN }: Props) {
                 border: `1px solid ${s.border}`,
                 color: s.color,
                 fontFamily: s.mono ? '"SF Mono", Menlo, Consolas, monospace' : undefined,
-                opacity: gone ? 0.4 : 1,
               }}
               title={`token #${id} · ${tok.bytes.length} 字节`}
             >
@@ -54,21 +53,15 @@ export default function VocabularyTable({ step, tokens, topN }: Props) {
                 基础
               </span>
             )}
-            <span className="ml-auto text-xs tabular-nums">
-              {gone ? (
-                <span className="text-slate-600">已被吸收 · 0</span>
-              ) : (
-                <span className="text-slate-300">{count} 次</span>
-              )}
+            <span className="ml-auto text-xs tabular-nums text-slate-300">
+              {count} 次
             </span>
           </div>
         );
       })}
-      {totalVocab > topN && (
-        <div className="pt-1 text-[11px] text-slate-500">
-          仅显示前 {topN} / 共 {totalVocab} 个（基础 {base.length} + 合并 {merged.length}）
-        </div>
-      )}
+      <div className="pt-1 text-[11px] text-slate-500">
+        当前在用 {inUse.length} 个 token{inUse.length > topN ? `（仅显示前 ${topN}）` : ""}
+      </div>
     </div>
   );
 }
