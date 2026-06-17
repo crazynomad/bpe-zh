@@ -3,6 +3,7 @@ import { trainBPE } from "./bpe";
 import TokenRow from "./components/TokenRow";
 import VocabularyTable from "./components/VocabularyTable";
 import MergeProduct from "./components/MergeProduct";
+import StepsBar from "./components/StepsBar";
 import Stats from "./components/Stats";
 import OriginalText from "./components/OriginalText";
 
@@ -227,20 +228,36 @@ export default function App() {
       {/* 响应式：窄屏自上而下堆叠；≥lg 三栏并排（a 原文 / b token 序列 / c 词表+合并产物）。
           minmax(0,…) 让超长 token 行收缩换行而非撑破栏宽，支持一直放大到超宽屏。 */}
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(200px,1fr)_minmax(0,2fr)_minmax(280px,340px)]">
-        <Panel title="原文（按字符，标注字节数）">
+        <Panel title="原文（按字符，标注字节数）" className="lg:max-h-[75vh]">
           <OriginalText text={text} />
         </Panel>
-        <Panel title="当前 token 序列">
+        <Panel title="当前 token 序列" className="lg:max-h-[75vh]">
           <TokenRow step={step} tokens={result.tokens} showIds={showIds} />
         </Panel>
-        <div className="space-y-4">
-          <Panel title="当前词表（按合并时间逆序）">
+        <div className="flex flex-col gap-4 lg:max-h-[75vh]">
+          <Panel title="当前词表（按合并时间逆序）" className="min-h-0 flex-1">
             <VocabularyTable step={step} tokens={result.tokens} topN={vocabTopN} />
           </Panel>
-          <Panel title="本步生成 token">
+          <Panel title="本步生成 token" className="shrink-0">
             <MergeProduct step={step} tokens={result.tokens} />
           </Panel>
         </div>
+      </div>
+
+      {/* BPE 步骤条：横向、全宽，显示在可视化下方 */}
+      <div className="mt-5 rounded-xl border border-slate-700/60 bg-slate-800/30 p-4">
+        <div className="mb-3 text-xs font-medium uppercase tracking-wide text-slate-400">
+          BPE 步骤（点击跳转）
+        </div>
+        <StepsBar
+          steps={result.steps}
+          tokens={result.tokens}
+          current={step.index}
+          onSelect={(i) => {
+            setPlaying(false);
+            setCurrent(i);
+          }}
+        />
       </div>
 
       <footer className="mt-10 border-t border-slate-800 pt-4 text-center text-xs text-slate-500">
@@ -256,13 +273,26 @@ function tokenText(result: ReturnType<typeof trainBPE>, id: number): string {
   return t.text === " " ? "␣" : t.text;
 }
 
-function Panel({ title, children }: { title: string; children: React.ReactNode }) {
+function Panel({
+  title,
+  children,
+  className,
+}: {
+  title: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  // flex 列：标题固定（shrink-0），正文在超出高度上限时自身滚动。
   return (
-    <div className="rounded-xl border border-slate-700/60 bg-slate-800/30 p-4">
-      <div className="mb-3 text-xs font-medium uppercase tracking-wide text-slate-400">
+    <div
+      className={`flex flex-col rounded-xl border border-slate-700/60 bg-slate-800/30 ${
+        className ?? ""
+      }`}
+    >
+      <div className="shrink-0 px-4 pt-4 pb-2 text-xs font-medium uppercase tracking-wide text-slate-400">
         {title}
       </div>
-      {children}
+      <div className="min-h-0 overflow-y-auto px-4 pb-4">{children}</div>
     </div>
   );
 }
