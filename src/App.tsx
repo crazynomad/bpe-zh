@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { trainBPE } from "./bpe";
 import TokenRow from "./components/TokenRow";
-import FrequencyTable from "./components/FrequencyTable";
+import VocabularyTable from "./components/VocabularyTable";
 import MergeProduct from "./components/MergeProduct";
 import Stats from "./components/Stats";
 import OriginalText from "./components/OriginalText";
@@ -21,6 +21,7 @@ export default function App() {
   const [maxMerges, setMaxMerges] = useState(60);
   const [minFrequency, setMinFrequency] = useState(2);
   const [showIds, setShowIds] = useState(false);
+  const [vocabTopN, setVocabTopN] = useState(10);
 
   const [current, setCurrent] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -57,7 +58,7 @@ export default function App() {
   const step = result.steps[Math.min(current, lastIndex)];
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
+    <div className="mx-auto w-full max-w-[1680px] px-4 py-8 2xl:px-8">
       <header className="mb-6">
         <h1 className="text-2xl font-bold text-slate-100 sm:text-3xl">
           中文 BPE 分词可视化
@@ -114,6 +115,17 @@ export default function App() {
               onChange={(e) => setMinFrequency(Number(e.target.value))}
             />
             <span className="w-6 tabular-nums text-slate-200">{minFrequency}</span>
+          </label>
+          <label className="flex items-center gap-2">
+            词表显示数量
+            <input
+              type="range"
+              min={5}
+              max={30}
+              value={vocabTopN}
+              onChange={(e) => setVocabTopN(Number(e.target.value))}
+            />
+            <span className="w-6 tabular-nums text-slate-200">{vocabTopN}</span>
           </label>
           <label className="flex cursor-pointer items-center gap-2">
             <input
@@ -212,8 +224,9 @@ export default function App() {
         )}
       </div>
 
-      {/* viewport 足够宽（xl）时三栏并排；否则自上而下堆叠 */}
-      <div className="grid items-start gap-4 xl:grid-cols-[1fr_1.5fr_300px]">
+      {/* 响应式：窄屏自上而下堆叠；≥lg 三栏并排（a 原文 / b token 序列 / c 词表+合并产物）。
+          minmax(0,…) 让超长 token 行收缩换行而非撑破栏宽，支持一直放大到超宽屏。 */}
+      <div className="grid items-start gap-4 lg:grid-cols-[minmax(200px,1fr)_minmax(0,2fr)_minmax(280px,340px)]">
         <Panel title="原文（按字符，标注字节数）">
           <OriginalText text={text} />
         </Panel>
@@ -221,11 +234,11 @@ export default function App() {
           <TokenRow step={step} tokens={result.tokens} showIds={showIds} />
         </Panel>
         <div className="space-y-4">
-          <Panel title="本步合并产物">
-            <MergeProduct step={step} tokens={result.tokens} />
+          <Panel title="当前词表（按合并时间逆序）">
+            <VocabularyTable step={step} tokens={result.tokens} topN={vocabTopN} />
           </Panel>
-          <Panel title="相邻对频率表">
-            <FrequencyTable step={step} tokens={result.tokens} />
+          <Panel title="本步生成 token">
+            <MergeProduct step={step} tokens={result.tokens} />
           </Panel>
         </div>
       </div>
