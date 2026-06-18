@@ -238,33 +238,34 @@ export default function App() {
       {/* 响应式：窄屏自上而下堆叠；≥lg 三栏并排（a 原文 / b token 序列 / c 词表+合并产物）。
           minmax(0,…) 让超长 token 行收缩换行而非撑破栏宽，支持一直放大到超宽屏。 */}
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(200px,1fr)_minmax(0,2fr)_minmax(280px,340px)]">
-        <Panel title="原文（可编辑）" className="lg:h-[75vh]">
+        <Panel
+          title="原文（可编辑）"
+          className="lg:h-[75vh]"
+          headerRight={
+            <select
+              value={PRESETS.findIndex((p) => p.text === text)}
+              onChange={(e) => {
+                const i = Number(e.target.value);
+                if (i >= 0) setText(PRESETS[i].text);
+              }}
+              className="w-full rounded-lg px-2 py-1 text-xs outline-none"
+              style={{
+                background: "var(--bg-lifted)",
+                border: "1px solid var(--ink-faint)",
+                color: "var(--ink)",
+              }}
+              title="选择范本"
+            >
+              <option value={-1}>自定义文本（或选范本…）</option>
+              {PRESETS.map((p, i) => (
+                <option key={p.label} value={i}>
+                  {p.label}
+                </option>
+              ))}
+            </select>
+          }
+        >
           <div className="flex h-full flex-col">
-            {/* 范本：下拉选择 */}
-            <div className="mb-3 flex shrink-0 items-center gap-2">
-              <span className="ds-eyebrow ds-eyebrow--dim">范本</span>
-              <select
-                value={PRESETS.findIndex((p) => p.text === text)}
-                onChange={(e) => {
-                  const i = Number(e.target.value);
-                  if (i >= 0) setText(PRESETS[i].text);
-                }}
-                className="flex-1 rounded-lg px-2 py-1.5 text-xs outline-none"
-                style={{
-                  background: "var(--bg-lifted)",
-                  border: "1px solid var(--ink-faint)",
-                  color: "var(--ink)",
-                }}
-              >
-                <option value={-1}>自定义文本（或选一篇范本…）</option>
-                {PRESETS.map((p, i) => (
-                  <option key={p.label} value={i}>
-                    {p.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
             {showCharInfo ? (
               <>
                 <div
@@ -338,16 +339,20 @@ function Panel({
   title,
   children,
   className,
+  headerRight,
 }: {
   title: string;
   children: React.ReactNode;
   className?: string;
+  headerRight?: React.ReactNode;
 }) {
   // flex 列：标题固定（shrink-0），正文在超出高度上限时自身滚动。
+  // headerRight：与标题同一行、靠右的额外控件（如范本下拉）。
   return (
     <div className={`ds-card flex flex-col ${className ?? ""}`}>
-      <div className="ds-eyebrow ds-eyebrow--dim shrink-0 px-4 pt-4 pb-2">
-        {title}
+      <div className="flex shrink-0 items-center gap-3 px-4 pt-4 pb-2">
+        <span className="ds-eyebrow ds-eyebrow--dim shrink-0">{title}</span>
+        {headerRight && <div className="ml-auto min-w-0 flex-1">{headerRight}</div>}
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">{children}</div>
     </div>
