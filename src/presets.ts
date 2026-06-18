@@ -43,10 +43,6 @@ export const PRESETS: { label: string; text: string }[] = [
   { label: "乔布斯经典名句", text: JOBS },
   { label: "Attention Is All You Need · 英（全文）", text: attentionEn.trim() },
   { label: "刘家琨获奖感言 · 双语", text: liuJiakun.trim() },
-  {
-    label: "春 · 朱自清",
-    text: "盼望着，盼望着，东风来了，春天的脚步近了。一切都像刚睡醒的样子，欣欣然张开了眼。",
-  },
 ];
 
 export const DEFAULT_TEXT = PRESETS[0].text;

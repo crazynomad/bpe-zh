@@ -240,21 +240,29 @@ export default function App() {
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(200px,1fr)_minmax(0,2fr)_minmax(280px,340px)]">
         <Panel title="原文（可编辑）" className="lg:h-[75vh]">
           <div className="flex h-full flex-col">
-            {/* 范本：点选即填入 */}
-            <div className="mb-3 flex shrink-0 flex-wrap gap-1.5">
-              {PRESETS.map((p) => (
-                <button
-                  key={p.label}
-                  onClick={() => setText(p.text)}
-                  className="rounded-full px-2.5 py-1 text-[11px] transition"
-                  style={{
-                    border: `1px solid ${text === p.text ? "var(--accent)" : "var(--ink-faint)"}`,
-                    color: text === p.text ? "var(--accent)" : "var(--ink-muted)",
-                  }}
-                >
-                  {p.label}
-                </button>
-              ))}
+            {/* 范本：下拉选择 */}
+            <div className="mb-3 flex shrink-0 items-center gap-2">
+              <span className="ds-eyebrow ds-eyebrow--dim">范本</span>
+              <select
+                value={PRESETS.findIndex((p) => p.text === text)}
+                onChange={(e) => {
+                  const i = Number(e.target.value);
+                  if (i >= 0) setText(PRESETS[i].text);
+                }}
+                className="flex-1 rounded-lg px-2 py-1.5 text-xs outline-none"
+                style={{
+                  background: "var(--bg-lifted)",
+                  border: "1px solid var(--ink-faint)",
+                  color: "var(--ink)",
+                }}
+              >
+                <option value={-1}>自定义文本（或选一篇范本…）</option>
+                {PRESETS.map((p, i) => (
+                  <option key={p.label} value={i}>
+                    {p.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {showCharInfo ? (
