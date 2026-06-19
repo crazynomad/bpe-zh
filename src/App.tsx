@@ -79,6 +79,16 @@ export default function App() {
         <p className="mt-2 text-sm italic" style={{ color: "var(--ink-dim)" }}>
           “可视化的目的是洞察，而非图像。” —— Ben Shneiderman
         </p>
+        <p
+          className="mt-3 max-w-3xl rounded-lg px-3 py-2 text-xs leading-relaxed"
+          style={{
+            background: "color-mix(in srgb, var(--ink) 4%, transparent)",
+            border: "1px solid color-mix(in srgb, var(--ink) 10%, transparent)",
+            color: "var(--ink-dim)",
+          }}
+        >
+          注：这里演示的是 BPE <b style={{ color: "var(--ink-muted)" }}>「怎么学」</b>出分词规则 —— 讲清中文费 token 的<b style={{ color: "var(--ink-muted)" }}>机制</b>（一个汉字 = 3 字节）。某段文本在 GPT-4 等模型下<b style={{ color: "var(--ink-muted)" }}>实际</b>花几个 token，取决于它训练好的固定词表（可用 Tiktokenizer 查），不是这里现学的小语料。
+        </p>
       </header>
 
       {/* 控制台（参数 + 播放整合在一张卡）*/}
